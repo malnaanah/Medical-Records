@@ -1,0 +1,279 @@
+<script>
+const messages = {
+    'recoveringSession': {
+        'en': 'Recovering unsaved session',
+        'ar': 'استرجاع جلسة غير محفوظة'
+    },  
+    'endDate': {
+        'en': 'End date',
+        'ar': 'تاريخ النهاية'
+    },  
+    'startDate': {
+        'en': 'Start date',
+        'ar': 'تاريخ البداية'
+    },    
+    'plotStatsDaily': {
+        'en': 'Day graph',
+        'ar': 'منحنى الأيام'
+    },    
+    'plotStatsMonthly': {
+        'en': 'Month graph',
+        'ar': 'منحى الشهور'
+    },    
+    'onlyFirstVisit': {
+        'en': 'First visit',
+        'ar': 'الزيارة الأولى'
+    },  
+    'statsScreen': {
+        'en': 'Statistics Screen',
+        'ar': 'شاشة الإحصاءات'
+    },  
+    'visits': {
+        'en': 'Visits',
+        'ar': 'الزيارات'
+    },
+    'images': {
+        'en': 'Images',
+        'ar': 'الصور'
+    },
+    'noResultsFound': {
+        'en': 'No results found',
+        'ar': 'لم يتم العثور على نتائج'
+    },
+    'imageSizeMustBeInteger': {
+        'en': 'Image resize value must be positive integer',
+        'ar': ' تصغير الصورة يجب ان يكون لرقم صحيح موجب'
+    },
+    'yes': {
+        'en': 'Yes',
+        'ar': 'نعم'
+    },
+    'no': {
+        'en': 'No',
+        'ar': 'لا'
+    },
+    'cancel': {
+        'en': 'Cancel',
+        'ar': 'إلغاء'
+    },
+    'noVisits': {
+        'en': 'No visits',
+        'ar': 'لا يوجد زيارات'
+    },
+    'noImages': {
+        'en': 'No images',
+        'ar': 'لا يوجد صور'
+    },
+    'pleaseWait': {
+        'en': 'Please Wait',
+        'ar': 'الرجاء الانتظار'
+    },
+    'googleError': {
+        'en': 'Server error',
+        'ar': 'خطا في الخادم',
+    },
+    'pageTitle': {
+        'en': 'Language test.',
+        'ar': 'تجربة اللغة.',
+    },
+    'addingPatient': {
+        'en': 'Add new record',
+        'ar': "إضافة سجل جديد",
+    },
+    'searchScreenMessage':{
+        'en': 'To search between words use [word.*word]',
+        'ar': "للبحث بين الكلمات استخدم [كلمة.*كلمة]",
+    },
+    'chooseExelFile':{
+        'en': 'Importing Excel file from (MedClin patient record)  App',
+        'ar': "استيراد ملف اكسل من برنامج (السجلات الطبية MedClin)",
+    },
+    'chooseExelFileFirst':{
+        'en': 'Please select file first',
+        'ar': "الرجاء اختيار الملف أولا ",
+    },
+    'mustFillName':{
+        'en': "Must fill name field first",
+        'ar': "يجب ملء خانة الاسم",
+    },
+    'name':{
+        'en': "Name",
+        'ar': "الاسم",
+    },
+    'phone':{
+        'en': "Phone",
+        'ar': "الهاتف",
+    },
+    'address':{
+        'en': "ِAddress",
+        'ar': "العنوان",
+    },
+    'birthDate':{
+        'en': "Birthdate",
+        'ar': "تاريخ الميلاد",
+    },
+    'bloodType':{
+        'en': "Blood type",
+        'ar': "فصيلة الدم",
+    },
+    'notes':{
+        'en': "Notes",
+        'ar': "ملاحظات",
+    },
+    'visitTime':{
+        'en': "Visit time",
+        'ar': "وقت الزيارة",
+    },
+    'visitNotes':{
+        'en': "Notes",
+        'ar': "ملاحظات",
+    },
+    'waitExelFileImport':{
+        'en': "Please wait. Importing file takes long time",
+        'ar': "الرجاء الانتظار، يستغرق استيراد الملف وقتا طويلا",
+    },
+    'doYouWantToSave':{
+        'en': "Do you want to save changes?",
+        'ar': "هل تريد حفظ التغييرات؟",
+    },
+    'sureDeletePatientRecord':{
+        'en': "All visits and images will be deleted. Are you sure?",
+        'ar': "جميع الزيارات والصور سيتم حذفها. هل انت متأكد؟",
+    },
+    'changingLanguage':{
+        'en': "Changing application language in progress",
+        'ar': "جاري تغيير لغة البرنامج",
+    },
+    'loadingImageFailed':{
+        'en': "Loading image failed",
+        'ar': "فشل تحميل الصورة",
+    },
+    'sureDeleteImage':{
+        'en': "Are you sure about deleting the image?",
+        'ar': "هل انت متأكد من حذف الصورة؟",
+    },
+    'uploadingImage':{
+        'en': "Uploading image",
+        'ar': "جاري تحميل الصورة",
+    },
+    'imageResizeAndUploading':{
+        'en': "Downscaling and uploading image",
+        'ar': "جاري تصغير الصورة وتحميلها",
+    },
+    'imageUploadedSuccessfully':{
+        'en': "Image uploaded successfully",
+        'ar': "تم تحميل الصورة بنجاح",
+    },
+    'imageUploadingFailed':{
+        'en': "Image uploading failed",
+        'ar': "فشل تحميل الصورة",
+    },
+    'importingFailed':{
+        'en': "Importing file failed",
+        'ar': "فشل استيراد الملف",
+    },
+    'sureDeleteVisit':{
+        'en': "Are you sure about deleting visit?",
+        'ar': "هل انت متأكد من حذف الزيارة؟",
+    },
+    'dataSavedSuccessfully':{
+        'en': "Data saved successfully",
+        'ar': "تم حفظ البيانات بنجاح",
+    },
+    'sureUpdateTime':{
+        'en': "Do you want to update time?",
+        'ar': "هل تريد تحديث الوقت؟",
+    },
+    'writeOnlyInOneField':{
+        'en': "Must write in one field only",
+        'ar': "يجب الكتابة في حقل واحد فقط",
+    },
+    'writeInOneField':{
+        'en': "Must write in one of the fields",
+        'ar': "يجب الكتابة في احد الحقول",
+    },
+    'savingVisit':{
+        'en': "Saving visit",
+        'ar': "جاري حفظ الزيارة",
+    },
+    'cancellingSearch':{
+        'en': "Cancelling search",
+        'ar': "جاري الغاء البحث",
+    },
+};
+
+//===================================================================
+function getMessage(key,response){
+  switch(key) {    
+  case 'visitDatesImported':
+    var message = {
+      'en': "Finished importing visit dates <br> Visits: [ " + totalDates + " ] \u00A0\u00A0 Invalid date:  [ " + invalidDates + " ]<br> First visit: [ " + totalFirstDates+ " ] \u00A0\u00A0 Invalid date: [ "+ invalidFirstDates+ " ]",
+      'ar': "تم استيراد تواريخ الزيارات <br> الزيارات: [ " + totalDates + " ] \u00A0\u00A0 تاريخ خطأ: [ " + invalidDates +  " ] <br> زيارة أولى: [ " + totalFirstDates + " ] \u00A0\u00A0 تاريخ خطأ:[ " + invalidFirstDates +  " ]",
+    }
+    return message[language];
+  case 'homePageTitle':
+    var message = {
+      'en': "Medical Records (Main Screen)<br> Files [" + spreadsheetDictKeys.length +  ']\u00A0\u00A0 Records [' + totalRecords + ']',
+      'ar': "السجلات الطبية (الشاشة الرئيسية)<br> الملفات [" + spreadsheetDictKeys.length +  ']\u00A0\u00A0 السجلات [' + totalRecords + ']',
+    }
+    return message[language];
+  case 'recordImportSucess':
+    var message = {
+      'en': `${response.importedRows} records imported successfully`,
+      'ar': `تم استيراد ${response.importedRows} سجل بنجاح`,
+    }
+    return message[language];
+  case 'imageWillBeReduced':
+    var message = {
+      'en':'<input type="checkbox" id="resizeImageChk" onchange="updateImageSizeChk()">' +
+       "Resize uploaded images to" + "&nbsp;&nbsp;&nbsp" +
+        '<input autocomplete="off" type="number" id="imageSizeTxt" oninput="updateMaxImageSize()">' +
+        "&nbsp;&nbsp;&nbsp;" + "Mega Pixel",
+      'ar':'<input type="checkbox" id="resizeImageChk" onchange="updateImageSizeChk()"">' +
+       "تصغير الصور المرفوعة لـ "+ "&nbsp;&nbsp;&nbsp" +
+        '<input autocomplete="off" type="number" id="imageSizeTxt" oninput="updateMaxImageSize()">' +
+        "&nbsp;&nbsp;&nbsp;" + "ميجا بكسل",
+    }
+    return message[language];
+
+  case 'searchShowNumbers':
+    var message = {
+      'en':"Visit/Image Number" + '<input type="checkbox" id="searchShowNumbersChk">',
+      'ar':"عدد الزيارات\\الصور" + '<input type="checkbox" id="searchShowNumbersChk">',
+    }
+    return message[language];
+
+  case 'nameAndVisit':
+    var message = {
+      'en': "Name [" + activeName + "] \u00A0\u00A0 Visit [" + activeVisit + "/" + totalVisits + "]",
+      'ar': "الاسم [" + activeName + "] \u00A0\u00A0 الزيارة [" + activeVisit + "\\" + totalVisits + "]",
+    }
+    return message[language];
+  case 'nameAndTotalImages':
+    var message = {
+      'en': "Name [" + activeName + "] \u00A0\u00A0 Images [" + imageArray.length + "]",
+      'ar': "الاسم [" + activeName + "] \u00A0\u00A0 الصور [" + imageArray.length + "]",
+    }
+    return message[language];
+  case 'nameAndTotalVisits':
+    var message = {
+      'en': "Name [" + activeName + "] \u00A0\u00A0 Visits [" + totalVisits + "]",
+      'ar': "الاسم [" + activeName + "] \u00A0\u00A0 الزيارات [" + totalVisits + "]",
+    }
+    return message[language];
+  case 'recordAndFile':
+    var message = {
+      'en': "File [" + activeSpreadsheetName + "] Row [" + activeRow + "]",
+      'ar': "الملف [" + activeSpreadsheetName + "] السطر [" + activeRow+ "]",
+    }
+    return message[language];
+  case 'totalSearchResults':
+    var message = {
+      'en': "Search results [" + patientArray.length + "]",
+      'ar': "نتائج البحث [" + patientArray.length + "]",
+    }
+    return message[language];
+
+  }
+}
+</script>
