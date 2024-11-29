@@ -1,0 +1,188 @@
+ 
+<!-- HTML code -->
+
+<!DOCTYPE html>
+<html dir='rtl'>
+<head>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <base target="_top">
+  <?!= include('styles'); ?>
+</head>
+<body>
+  <div id='overlayDiv' class="overlay">
+    <center>
+      <div class="overlay-icon material-icons">report_gmailerrorred</div>
+    </center>
+  </div>
+  <div id="mainDiv">
+    <div id="messageDiv">
+      <label id="messageLbl"></label>
+      <button class="text-icons" id="yesBtn" style="display:none;"></button>
+      <button class="text-icons" id="noBtn" style="display:none;"></button>
+      <button class="text-icons" id="cancelBtn" style="display:none;"></button>
+    </div>
+    <div id="disclaimerDiv" dir="rtl" style="display:none;">
+      <center>
+        <p dir="rtl" class="disclaimerMessage">
+        هذا البرنامج يعتمد على خدمات Google™ في عمله.
+        مطور البرنامج غير مسؤول في حالة اي توقف او تغيير على الخدمات التي تقدمها شركة Google.
+        </p>
+        <p dir="ltr" class="disclaimerMessage">
+        This program relies on Google™ services.
+        The developer is not responsible for any suspension or change in Google services.
+        </p>
+        <div id="disclaimerAgreeDiv" >
+          <table>
+            <th>
+              <input type="checkbox" id="dontShowAgainChk"  style="width: 20px;height: 20px;">
+            </th>
+            <th>
+              <P style="text-align: right;">
+                  لا تظهر الرسالة مجددا <br>
+                  Don't show message again<br>
+              <p>
+             </th>
+          </table>
+          <button class="material-icons" id="disclaimerAgreeBtn" onclick="hideDisclaimer()" >thumb_up_alt</button>
+        </div>
+      </center>
+    </div>
+
+    <!-- #################################### -->
+    <div id="homeDiv" class="controlDiv" style="display:none;">
+      <button id="addPatientBtn" class="material-icons navagation-button" onclick="addPatient()">person_add</button>
+      <button id="showSearchBtn" class="material-icons navagation-button" onclick="showSearchScreen()">search</button>
+      <button id="showImportBtn" class="material-icons navagation-button" onclick="showImportScreen()">import_export</button>
+      <button id="showStatsBtn" class="material-icons navagation-button" onclick="showStatsScreen()">query_stats</button>
+      <select id="languageSelector" onchange="changeLanguage()">
+          <option value="en">English</option>
+          <option value="ar">عربية</option>
+      </select>
+      <i class="material-icons">language</i>
+    </div>
+    <!-- #################################### -->
+    <div id="statsDiv" style="display:none;">
+      <div class="controlDiv" id="statsControlDiv" style="display:flex;">
+        <button id="exitStatsBtn" class="material-icons navagation-button" onclick="showHomeScreen()" >home</button>
+        <button id="getVisitDatesBtn" class="material-icons" onclick="getVisitDates()">cloud_download</button>
+      </div>
+      <div class="statsOptionsDiv" id="statsOptionsDiv" style="background-color: transparent; display:none;">
+        <div class="controlDiv" style="background-color: transparent;">
+          <label id="statsStartDateLbl" for="statsStartDate"></label>
+          <input type="date" id="statsStartDateInput" required>
+          <label id="statsEndDateLbl" for="statsEndDateInput"></label>
+          <input type="date" id="statsEndDateInput" required>
+        </div>
+        <div class="controlDiv" style="background-color: transparent;">
+          <button id="plotStatsMonthlyBtn" onclick="plotStatsMonthly()" ></button>
+          <button id="plotStatsDailyBtn" onclick="plotStatsDaily()"></button>
+          <div style="width:40%!important;">
+            <label  for="firstVisitStatsChk"><span id="firstVisitStatsLbl"></span><input type="checkbox" id="firstVisitStatsChk"></label>
+          </div>
+        </div>
+      </div>
+      <div id="statsChartDiv" class="infoDiv" style="height: 1000px;"></div>
+    </div>
+    <!-- #################################### -->
+    <div id="importDiv" class="controlDiv" style="display:none;">
+      <button class="navagation-button material-icons" id="exitImportBtn" onclick="showHomeScreen()" >home</button>
+      <button class="material-icons" id="importBtn" onclick="importFile()" >upload_file</button>
+      <input type="file" accept=".xlsx" id="xlsFileInput" style="display: none;">
+    </div>
+    <!-- #################################### -->
+    <div id="patientDiv" style="display:none;">
+      <div class="controlDiv" id="searchControlDiv" >
+          <button id="exitSearchBtn" class="material-icons navagation-button" onclick="showHomeScreen()" >home</button>
+          <button id="listPatientsBtn" class="material-icons" onclick="getPatientList()" >manage_search</button>
+          <button id="closePatientListBtn" class="material-icons" onclick="closePatientList()">playlist_remove</button>
+          <label  id="searchShowNumbers"></label>
+      </div>
+      <div class="controlDiv" id="patientControlDiv" >
+        <button id="exitPatientBtn" class="material-icons navagation-button" onclick="exitPatient('HOME')" >home</button>
+        <button id="exitPatientToSearchBtn" class="material-icons navagation-button" onclick="exitPatient('SEARCH')" >manage_search</button>
+        <button class="material-icons" id="savePatientBtn" onclick="savePatient()">save</button>
+        <button class="material-icons" id="deletePatientBtn" onclick="deletePatient()">person_remove</button>
+        <button id="showImageBtn" class="material-icons navagation-button" onclick="exitPatient('IMAGE')">image</button>
+        <button id="showVisitBtn" class="material-icons navagation-button" onclick="exitPatient('VISIT')">access_time_filled</button>
+      </div>
+      <div  class="infoDiv" id="patientInfoDiv">
+        <div><label for="name"></label><input class="patient_input" autocomplete="off" type="text" id="nameTxt"></div>
+        <div><label for="phone"></label><input class="patient_input" autocomplete="off" type="text" id="phoneTxt"></div>
+        <div><label for="address"></label><input class="patient_input" autocomplete="off" type="text" id="addressTxt"></div>
+        <div><label for="birthDate"></label><input class="patient_input" autocomplete="off"  type="text" id="birthDateTxt"></div>
+        <div><label for="bloodType"></label><input  class="patient_input" autocomplete="off"  type="text" id="bloodTypeTxt"></div>
+        <div>
+          <button class="material-icons" id="switchPatientDirectionBtn" onclick="switchNoteDirection()">compare_arrows</button>
+          <label class="notes-label" for="notes"></label>
+          <textarea dir="ltr" class="patient_input" id="patientNotesTxt"></textarea>
+        </div>
+      </div>
+      <div id="patientListDiv"></div>
+    </div>
+    <!-- #################################### -->
+    <div id="visitDiv" style="display:none;">
+      <div class="controlDiv">
+          <button id="exitVisitToHomeBtn" class="material-icons navagation-button" onclick="exitVisit('HOME')">home</button>
+          <button id="exitVisitToPatientBtn" class="material-icons navagation-button" onclick="exitVisit('PATIENT')">manage_accounts</button>
+          <button class="material-icons" id="addVisitBtn" onclick="exitVisit('ADD')">post_add</button>
+          <button class="material-icons" id="saveVisitBtn" onclick="saveVisit()">save</button>
+          <button class="material-icons" id="deleteVisitBtn" onclick="deleteVisit()">delete_forever</button>
+          <button class="material-icons" id="previousVisitBtn" onclick="exitVisit('PREVIOUS')">skip_next</button>
+          <button class="material-icons" id="nextVisitBtn" onclick="exitVisit('NEXT')">skip_previous</button>
+          <button class="material-icons" id="listVisitBtn" onclick="exitVisit('LIST')">grid_view</button>
+      </div>
+      <div id="visitInfoDiv" class="infoDiv">
+        <!-- <div class="controlDiv">
+          <button class="material-icons" id="setVisitDateBtn" onclick="updateVisitTime()">update</button>
+        </div> -->
+        <div  class="controlDiv">
+          <label id="visitDateLabel" for="visitTime"></label>
+          <div id="visitTimeDiv">
+            <input disabled autocomplete="off" type="text" id="visitTimeTxt">
+            <button class="material-icons" id="editVisitTimeBtn" onclick="editVisitTime()">edit</button>
+            <input type="date" id="dateInput" style="display: none;" name="date" required>
+            <input type="time" id="timeInput" style="display: none;" name="time" required>
+
+            <button class="material-icons" id="applyVisitTimeBtn" style="display: none;" onclick="updateVisitTime()">done</button>
+            <button class="material-icons" id="cancelVisitTimeBtn" style="display: none;" onclick="cancelVisitTime()">close</button>
+          </div>
+        </div>
+        <div>
+          <button class="material-icons" id="switchVisitDirectionBtn" onclick="switchNoteDirection()">compare_arrows</button>
+          <label class="notes-label" for="visitNotes"></label>
+          <textarea dir="ltr" class="visit_input" id="visitNotesTxt"></textarea>
+        </div>
+      </div>
+      <div id="visitListDiv"></div>
+    </div>
+    <!-- #################################### -->
+    <div id="imageDiv" style="display:none;">
+      <div class="controlDiv">
+          <button id="exitImageToHomeBtn" class="material-icons navagation-button" onclick="exitImage('HOME')">home</button>
+          <button id="exitImageToPatientBtn" class="material-icons navagation-button" onclick="exitImage('PATIENT')">manage_accounts</button>
+          <button class="material-icons" id="viewImagBtn" onclick="viewImage()">launch</button>
+          <button class="material-icons" id="addImagBtn" onclick="uploadImage()">upload_file</button>
+          <button class="material-icons" id="deleteImageBtn" onclick="deleteImage()">delete_forever</button>
+          <button class="material-icons" id="listImagesBtn" onclick="listImages()">photo_library</button>
+      </div>
+      <input type="file" id="imageFileInput" accept="image/*" style="display: none;">
+      <div class="controlDiv">
+          <label  id="imageMessage"></label>
+      </div>
+      <div id="imageListDiv"></div>
+      <img id="imageElement">
+    </div>
+    <!-- #################################### -->
+    <div id="creditDiv">
+      <p style="font-family: Arial; font-size: 11px; margin:0px;">
+      Copyright: Mahmoud Alnaanah (malnaanah@gmail.com) [13 Sep 2024]
+      </p>
+    </div>
+  </div>
+
+<?!= include('messages'); ?>
+<?!= include('scripts'); ?>
+</body>
+
+</html>
