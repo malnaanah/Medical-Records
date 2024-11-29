@@ -1,0 +1,2053 @@
+<script>
+const messageDelay=2000;
+var maxImageSize;
+var totalRecords;
+var enableImageResize;
+var language='ar';
+var currentScreen;
+var spreadsheetFolderId;
+var imageFolderId;
+var imageArray = [];
+var visitDatesArray = [];
+var firstVisitDatesArray = [];
+var patientArray = [];
+var activeSpreadsheetName;
+var activeSpreadsheetId;
+var patientSaved = true;
+var visitSaved = true;
+var imageUploaded = true;
+var activeImageId;
+var activeVisit;
+var totalVisits;
+var visitArray = [];
+var activeName;
+var activeScreen;
+var newSearch = true;
+var searchData = [];
+var spreadsheetDict;
+var spreadsheetDictKeys = [];
+var activeRow;
+var newPatient;
+var showSearchNumbers = true;
+var invalidDates;
+var totalDates;
+var invalidFirstDates;
+var totalFirstDates;
+
+
+
+const mainDiv = document.getElementById("mainDiv");
+
+const searchControlDiv = document.getElementById("searchControlDiv");
+const patientControlDiv = document.getElementById("patientControlDiv");
+const homeDiv = document.getElementById("homeDiv");
+const patientDiv = document.getElementById("patientDiv");
+const visitDiv = document.getElementById("visitDiv");
+const imageDiv = document.getElementById("imageDiv");
+const disclaimerDiv = document.getElementById("disclaimerDiv");
+const disclaimerAgreeDiv = document.getElementById("disclaimerAgreeDiv");
+const dontShowAgainChk = document.getElementById("dontShowAgainChk");
+const visitListDiv = document.getElementById("visitListDiv");
+const visitInfoDiv = document.getElementById("visitInfoDiv");
+const patientInfoDiv = document.getElementById("patientInfoDiv");
+const patientListDiv = document.getElementById("patientListDiv");
+
+const addPatientBtn = document.getElementById("addPatientBtn");
+const showSearchBtn = document.getElementById("showSearchBtn");
+const languageSelector = document.getElementById("languageSelector");
+
+const exitPatientBtn = document.getElementById("exitPatientBtn");
+const savePatientBtn = document.getElementById("savePatientBtn");
+const deletePatientBtn = document.getElementById("deletePatientBtn");
+const showVisitBtn = document.getElementById("showVisitBtn");
+const messageLbl = document.getElementById("messageLbl");
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+const cancelBtn = document.getElementById("cancelBtn");
+
+const exitSearchBtn = document.getElementById("exitSearchBtn");
+const listPatientsBtn = document.getElementById("listPatientsBtn");
+const closePatientListBtn = document.getElementById("closePatientListBtn");
+
+const nameTxt = document.getElementById("nameTxt");
+const phoneTxt = document.getElementById("phoneTxt");
+const addressTxt = document.getElementById("addressTxt");
+const birthDateTxt = document.getElementById("birthDateTxt");
+const bloodTypeTxt = document.getElementById("bloodTypeTxt");
+const patientNotesTxt = document.getElementById("patientNotesTxt");
+
+const exitVisitToPatientBtn = document.getElementById("exitVisitToPatientBtn");
+const exitVisitToHomeBtn = document.getElementById("exitVisitToHomeBtn");
+const addVisitBtn = document.getElementById("addVisitBtn");
+const saveVisitBtn = document.getElementById("saveVisitBtn");
+const deleteVisitBtn = document.getElementById("deleteVisitBtn");
+const previousVisitBtn = document.getElementById("previousVisitBtn");
+const nextVisitBtn = document.getElementById("nextVisitBtn");
+const applyVisitTimeBtn = document.getElementById("applyVisitTimeBtn");
+const editVisitTimeBtn = document.getElementById("editVisitTimeBtn");
+const cancelVisitTimeBtn = document.getElementById("cancelVisitTimeBtn");
+
+const statsDiv = document.getElementById("statsDiv");
+const statsOptionsDiv = document.getElementById("statsOptionsDiv");
+const statsChartDiv = document.getElementById("statsChartDiv");
+const statsStartDateInput = document.getElementById("statsStartDateInput");
+const statsEndDateInput = document.getElementById("statsEndDateInput");
+const firstVisitStatsChk = document.getElementById("firstVisitStatsChk");
+const firstVisitStatsLbl = document.getElementById("firstVisitStatsLbl");
+const plotStatsMonthlyBtn = document.getElementById("plotStatsMonthlyBtn");
+const plotStatsDailyBtn = document.getElementById("plotStatsDailyBtn");
+const statsStartDateLbl = document.getElementById("statsStartDateLbl");
+const statsEndDateLbl = document.getElementById("statsEndDateLbl");
+const exitStatsBtn = document.getElementById("exitStatsBtn");
+
+
+
+
+
+
+const dateInput = document.getElementById("dateInput");
+const timeInput = document.getElementById("timeInput");
+
+//image controls
+const exitImageToHomeBtn = document.getElementById("exitImageToHomeBtn");
+const exitImageToPatientBtn = document.getElementById("exitImageToPatientBtn");
+const viewImagBtn = document.getElementById("viewImagBtn");
+const addImagBtn = document.getElementById("addImagBtn");
+const deleteImageBtn = document.getElementById("deleteImageBtn");
+const listImagesBtn = document.getElementById("listImagesBtn");
+const imageFileInput = document.getElementById("imageFileInput");
+const imageMessage = document.getElementById("imageMessage");
+//===============
+const exitImportBtn = document.getElementById("exitImportBtn");
+const importBtn = document.getElementById("importBtn");
+const xlsFileInput = document.getElementById("xlsFileInput");
+const imageListDiv = document.getElementById("imageListDiv");
+const imageElement = document.getElementById("imageElement");
+
+const visitTimeTxt = document.getElementById("visitTimeTxt");
+const visitNotesTxt = document.getElementById("visitNotesTxt");
+
+
+// add listner to patient inputs, every time the patient information input
+// change, the patientSaved variable is set to false
+var patientInputs = document.getElementsByClassName('patient_input');
+Array.from(patientInputs).forEach(function(patientInput) {
+  patientInput.addEventListener('input', function(event) {
+    if(activeScreen == 'PATIENT'){
+      if(patientSaved){
+        localStorage.setItem('recover', 'PATIENT');
+        localStorage.setItem('newPatient', newPatient.toString());
+        localStorage.setItem('activeSpreadsheetName', activeSpreadsheetName);
+        if(!newPatient){
+          localStorage.setItem('activeRow', activeRow.toString());
+          localStorage.setItem('activeName', activeName);
+        }
+      }
+      localStorage.setItem('patientNotes', patientNotesTxt.value);
+      localStorage.setItem('name', nameTxt.value);
+      localStorage.setItem('phone', phoneTxt.value);
+      localStorage.setItem('address', addressTxt.value);
+      localStorage.setItem('birthDate', birthDateTxt.value);
+      localStorage.setItem('bloodType', bloodTypeTxt.value);
+    }
+    patientSaved = false;
+    savePatientBtn.disabled = false;
+  });
+});
+
+// add listner to visit inputs, every time the patient information input
+// change, the visitSaved variable is set to false
+var visitInputs = document.getElementsByClassName('visit_input');
+Array.from(visitInputs).forEach(function(visitInput) {
+  visitInput.addEventListener('input', function(event) {
+    // Save visit data locally to recover when page is closed or reloaded
+    if(visitSaved){
+      localStorage.setItem('recover', 'VISIT');
+      localStorage.setItem('activeSpreadsheetName', activeSpreadsheetName);
+      localStorage.setItem('activeRow', activeRow.toString());
+      localStorage.setItem('activeVisit', activeVisit.toString());
+      localStorage.setItem('totalVisits', totalVisits.toString());
+      localStorage.setItem('activeName', activeName);
+    }
+    localStorage.setItem('visitNotes', visitNotesTxt.value);
+    localStorage.setItem('visitTime', visitTimeTxt.value);
+    visitSaved = false;
+    saveVisitBtn.disabled = false;
+  });
+});
+
+
+
+// prevent user from leaving the page if the work is not saved
+window.addEventListener('beforeunload', function (e) {
+  if (!patientSaved | !visitSaved | !imageUploaded) {
+    e.preventDefault();
+    e.returnValue = ''; // Required for Chrome
+    return 'Are you sure you want to leave? Your work may not be saved.';
+  }
+});
+
+//===============================================
+function validateVisitTime() {
+    const isDateValid = dateInput.checkValidity();
+    const isTimeValid = timeInput.checkValidity();
+    applyVisitTimeBtn.disabled = !(isDateValid && isTimeValid);
+}
+
+dateInput.addEventListener('input', validateVisitTime);
+timeInput.addEventListener('input', validateVisitTime);
+
+
+
+
+messageLbl.textContent = "الرجاء الانتظار Please wait ";
+initiate();
+enableEnterKeySeaerch();
+
+
+// Load the Google Charts library
+google.charts.load('current', {'packages':['corechart']});
+// google.charts.setOnLoadCallback(drawChart);
+
+
+
+
+function initiate(){
+  google.script.run.withSuccessHandler(function(response){
+    if (response.status=="SUCCESS"){
+      totalRecords = response.totalRecords;
+      language = response.language;
+      maxImageSize = response.maxImageSize;
+      enableImageResize = response.enableImageResize;
+
+      document.getElementById('languageSelector').value = language;
+      spreadsheetFolderId = response.spreadsheetFolderId;
+      imageFolderId = response.imageFolderId;
+      spreadsheetDict = response.spreadsheetDict;
+      spreadsheetDictKeys = Object.keys(spreadsheetDict).sort();
+
+      if (response.showDisclaimer=="on"){
+        disclaimerDiv.style.display = "block";
+        disclaimerAgreeDiv.style.display = "none";
+        disclaimerAgreeDiv.style.display = "block";
+      }
+
+      // check if unsaved session is last session
+      if(localStorage.getItem('recover') == 'VISIT' || localStorage.getItem('recover') == 'PATIENT'){
+        if (response.lastSessionTime == localStorage.getItem('lastSessionTime')){
+          messageLbl.innerHTML = messages['recoveringSession'][language]
+          setTimeout(function(){
+            updateAppLanguage();
+          }, messageDelay);
+          return;
+        }
+      }
+
+
+
+      localStorage.setItem('recover', 'NONE');
+      // Updating session date
+      var currentDate = new Date();
+      localStorage.setItem('lastSessionTime',currentDate.toISOString())
+      google.script.run.withSuccessHandler(function(response){
+        if (response.status=="SUCCESS"){
+          updateAppLanguage();
+        }else{
+          messageLbl.innerHTML = messages['googleError'][language] + "<br>" + response.error;
+        }
+      }).configure('lastSessionTime','write',currentDate.toISOString());
+    }else{
+      messageLbl.innerHTML = messages['googleError'][language] + "<br>" + response.error;
+    }
+  }).initiate();
+}
+
+
+function hideDisclaimer(){
+  disclaimerDiv.style.display = "none";
+  var status='on'
+  if(dontShowAgainChk.checked) status = 'off'
+  google.script.run.withSuccessHandler(function(response){
+    if (response.status=="SUCCESS"){
+    }else{
+      messageLbl.innerHTML = messages['googleError'][language] + "<br>" + response.error;
+    }
+  }).configure('showDisclaimer','write',status);
+}
+//===================================================================
+function changeLanguage(){
+  language = document.getElementById('languageSelector').value;
+  messageLbl.textContent = messages['changingLanguage'][language];
+  disableHomeControls(true);
+  google.script.run.withSuccessHandler(function(response){
+    if (response.status=="SUCCESS"){
+      updateAppLanguage();
+    }else{
+      messageLbl.innerHTML = messages['googleError'][language] + "<br>" + response.error;
+    }
+  }).configure('language','write',language);
+}
+//===================================================================
+function updateAppLanguage(action) {
+  if (language == "ar"){
+    mainDiv.style.direction = 'rtl';
+    previousVisitBtn.textContent  = "skip_next";
+    nextVisitBtn.textContent  = "skip_previous";
+  }else{
+    mainDiv.style.direction = 'ltr';
+    previousVisitBtn.textContent  = "skip_previous";
+    nextVisitBtn.textContent  = "skip_next";
+  }
+
+  // setting text for lables
+  document.querySelector('label[for="name"]').textContent =  messages['name'][language];
+  document.querySelector('label[for="phone"]').textContent =  messages['phone'][language];
+  document.querySelector('label[for="address"]').textContent =  messages['address'][language];
+  document.querySelector('label[for="birthDate"]').textContent =  messages['birthDate'][language];
+  document.querySelector('label[for="bloodType"]').textContent =  messages['bloodType'][language];
+  document.querySelector('label[for="notes"]').textContent =  messages['notes'][language];
+  document.querySelector('label[for="visitTime"]').textContent =  messages['visitTime'][language];
+  document.querySelector('label[for="visitNotes"]').textContent =  messages['visitNotes'][language];
+  // set text for message buttons
+  yesBtn.textContent = messages['yes'][language];
+  noBtn.textContent = messages['no'][language];
+  cancelBtn.textContent = messages['cancel'][language];
+  if(localStorage.getItem('recover') == 'VISIT'){
+    showVisitScreen('SAVED');
+  }else if (localStorage.getItem('recover') == 'PATIENT'){
+    showPatientScreen('SAVED');
+  }else{
+    showHomeScreen();
+  }
+}
+//===================================================================
+function showHomeScreen(){
+  activeScreen = "HOME";
+  clearInputs();
+  disableHomeControls(false);
+  patientSaved = true;
+  visitSaved = true;
+  newPatient = false;
+  messageLbl.innerHTML = getMessage('homePageTitle');
+  homeDiv.style.display = "flex";
+  patientDiv.style.display = "none";
+  importDiv.style.display = "none";
+  visitDiv.style.display = "none";
+  imageDiv.style.display = "none";
+  statsDiv.style.display = "none";
+}
+
+//===================================================================
+function showImportScreen(){
+    patientSaved = true;
+  visitSaved = true;
+
+  xlsFileInput.value = "";
+
+  activeScreen = "IMPORT";
+  messageLbl.textContent =  messages['chooseExelFile'][language];
+  homeDiv.style.display = "none";
+  patientDiv.style.display = "none";
+  importDiv.style.display = "flex";
+  visitDiv.style.display = "none";
+  imageDiv.style.display = "none";
+}
+
+//=========================================================
+function exitPatient(action){
+  disablePatientControls(true);
+  disablePatientInputs(true);
+  if (!patientSaved){
+    oldMessage = messageLbl.textContent;
+    messageLbl.textContent =  messages['doYouWantToSave'][language];
+    yesBtn.style.display = "block";
+    noBtn.style.display = "block";
+    cancelBtn.style.display = "block";
+    disablePatientControls(true);
+
+    cancelBtn.onclick = function() {
+      yesBtn.style.display = "none";
+      noBtn.style.display = "none";
+      cancelBtn.style.display = "none";
+      yesBtn.onclick = null;
+      noBtn.onclick = null;
+      cancelBtn.onclick = null;
+      messageLbl.textContent = oldMessage;
+      disablePatientControls(false);
+      disablePatientInputs(false);
+      return;
+    }
+
+    yesBtn.onclick = function() {
+      yesBtn.style.display = "none";
+      noBtn.style.display = "none";
+      cancelBtn.style.display = "none";
+      yesBtn.onclick = null;
+      noBtn.onclick = null;
+      cancelBtn.onclick = null;
+      savePatient(action);
+    }
+    noBtn.onclick = function() {
+      patientSaved = true;
+      localStorage.setItem('recover', 'NONE');
+
+      yesBtn.style.display = "none";
+      noBtn.style.display = "none";
+      cancelBtn.style.display = "none";
+      yesBtn.onclick = null;
+      noBtn.onclick = null;
+      cancelBtn.onclick = null;
+      if(action=='HOME'){
+        showHomeScreen();
+      }else if(action == 'VISIT'){
+        showVisitScreen();
+      }else if(action == 'IMAGE'){
+        showImageScreen();
+      }else if(action == 'SEARCH'){
+      showSearchScreen();
+    }
+    }
+  }else{
+    if(action=='HOME'){
+      showHomeScreen();
+    }else if(action == 'VISIT'){
+      showVisitScreen();
+    }else if(action == 'IMAGE'){
+      showImageScreen();
+    }else if(action == 'SEARCH'){
+      showSearchScreen();
+    }
+  }
+}
+
+//==============================================================
+function addPatient(){
+  newPatient = true;
+  showPatientScreen();
+}
+//================================================================
+function showPatientScreen(patientIndex){
+  messageLbl.textContent = messages['pleaseWait'][language];
+  activeScreen = "PATIENT";
+  clearInputs();
+
+  visitSaved = true;
+  patientSaved = true;
+
+  searchControlDiv.style.display = "none";
+  patientControlDiv.style.display = "flex";
+  homeDiv.style.display = "none";
+  patientDiv.style.display = "flex";
+
+  patientListDiv.style.display = "none";
+  visitDiv.style.display = "none";
+  imageDiv.style.display = "none";
+  disablePatientControls(true);
+  disablePatientInputs(true);
+
+  if(patientIndex == 'SAVED'){
+
+    newPatient = localStorage.getItem('newPatient') == 'true';
+    patientSaved = false;
+    if(newPatient){
+      messageLbl.textContent = messages['addingPatient'][language];
+      disablePatientControls(false);
+      disablePatientInputs(false);
+      showVisitBtn.disabled = true;
+      showImageBtn.disabled = true;
+      deletePatientBtn.disabled = true;
+      patientInfoDiv.style.display = "flex";
+      exitPatientToSearchBtn.disabled = true;
+      savePatientBtn.disabled = false;
+
+      nameTxt.value = localStorage.getItem('name');
+      phoneTxt.value = localStorage.getItem('phone');
+      addressTxt.value = localStorage.getItem('address');
+      birthDateTxt.value = localStorage.getItem('birthDate');
+      bloodTypeTxt.value = localStorage.getItem('bloodType');
+      patientNotesTxt.value = localStorage.getItem('patientNotes');
+    }else{
+
+      activeName = localStorage.getItem('activeName');
+      activeSpreadsheetName = localStorage.getItem('activeSpreadsheetName');
+      activeSpreadsheetId: spreadsheetDict[activeSpreadsheetName],
+
+      nameTxt.value = localStorage.getItem('name');
+      phoneTxt.value = localStorage.getItem('phone');
+      addressTxt.value = localStorage.getItem('address');
+      birthDateTxt.value = localStorage.getItem('birthDate');
+      bloodTypeTxt.value = localStorage.getItem('bloodType');
+      patientNotesTxt.value = localStorage.getItem('patientNotes');
+
+      activeRow = localStorage.getItem('activeRow');
+
+      patientInfoDiv.style.display = "flex";
+      disablePatientControls(false);
+      disablePatientInputs(false);
+      messageLbl.textContent = getMessage("recordAndFile");
+      savePatientBtn.disabled = false;
+    }
+    return;
+  }
+
+
+  if (patientIndex !== undefined){
+    activeName = patientArray[patientIndex][0];
+    activeSpreadsheetName = patientArray[patientIndex][1];
+    activeRow = patientArray[patientIndex][2];
+  }
+
+
+
+  if (!newPatient){
+    var data = {
+      activeSpreadsheetId: spreadsheetDict[activeSpreadsheetName],
+      activeRow:activeRow
+    };
+
+    google.script.run.withSuccessHandler(function(response){
+      if (response.status=="SUCCESS"){
+        activeName = response.name;
+        nameTxt.value = response.name;
+        phoneTxt.value = response.phone;
+        addressTxt.value = response.address;
+        birthDateTxt.value = response.birthDate;
+        bloodTypeTxt.value = response.bloodType;
+        patientNotesTxt.value = response.patientNotes;
+        patientInfoDiv.style.display = "flex";
+        disablePatientControls(false);
+        disablePatientInputs(false);
+        messageLbl.textContent = getMessage("recordAndFile");
+        savePatientBtn.disabled = true;
+      }else{
+        messageLbl.innerHTML = messages['googleError'][language] + "<br>" + response.error;
+      }
+    }).getPatient(data);
+  }else{ // new patient
+
+    messageLbl.textContent = messages['addingPatient'][language];
+    disablePatientControls(false);
+    disablePatientInputs(false);
+    showVisitBtn.disabled = true;
+    showImageBtn.disabled = true;
+    deletePatientBtn.disabled = true;
+    patientInfoDiv.style.display = "flex";
+    exitPatientToSearchBtn.disabled = true;
+    savePatientBtn.disabled = true;
+  }
+}
+//=============================================================
+function showStatsScreen(){
+  patientSaved = true;
+  visitSaved = true;
+  activeScreen = "STATS";
+
+  getVisitDatesBtn.disabled = false;
+  messageLbl.textContent = messages['statsScreen'][language];
+  firstVisitStatsLbl.innerHTML = messages['onlyFirstVisit'][language];
+  plotStatsMonthlyBtn.textContent = messages['plotStatsMonthly'][language];
+  plotStatsDailyBtn.textContent = messages['plotStatsDaily'][language];
+  statsStartDateLbl.textContent = messages['startDate'][language];
+  statsEndDateLbl.textContent = messages['endDate'][language];
+
+
+  patientControlDiv.style.display = "none";
+  homeDiv.style.display = "none";
+  patientDiv.style.display = "none";
+  statsDiv.style.display = "flex";
+  visitDiv.style.display = "none";
+  imageDiv.style.display = "none";
+  searchControlDiv.style.display = "none";
+  statsOptionsDiv.style.display = "none";
+  statsChartDiv.style.display = "none";
+}
+//=============================================================
+function getVisitDates(){
+
+  messageLbl.textContent =  messages['pleaseWait'][language];
+  getVisitDatesBtn.disabled = true;
+  exitStatsBtn.disabled = true;
+
+
+  google.script.run.withSuccessHandler(function(response) {
+    if (response.status=="SUCCESS"){
+      totalDates = response.visitDatesArray.length;
+      visitDatesArray = removeInvalidDates(response.visitDatesArray);
+      invalidDates = totalDates - visitDatesArray.length;
+      totalFirstDates = response.firstVisitDatesArray.length;
+      firstVisitDatesArray = removeInvalidDates(response.firstVisitDatesArray);
+      invalidFirstDates = totalFirstDates - firstVisitDatesArray.length;
+      messageLbl.innerHTML =  getMessage('visitDatesImported');
+      statsOptionsDiv.style.display = "flex";
+      exitStatsBtn.disabled = false;
+    }else{
+      messageLbl.innerHTML = messages['googleError'][language] + "<br>" + response.error;
+    }
+  }).getVisitDates(spreadsheetDict);
+
+}
+//=============================================================
+// Function to remove invalid dates from an array
+function removeInvalidDates(array) {
+    return array.filter(element => element != 'Invalid Date');
+}
+//=============================================================
+function countDayOccurrences(array) {
+    const dateCountMap = new Map();
+
+    // Iterate over each sub-array and extract the date
+    array.forEach(subArray => {
+        const dateTime = subArray[0];
+        const [date] = dateTime.split(','); // Split by comma and take the first part (the date)
+
+        // Update the count of the date in the map
+        if (dateCountMap.has(date)) {
+            dateCountMap.set(date, dateCountMap.get(date) + 1);
+        } else {
+            dateCountMap.set(date, 1);
+        }
+    });
+
+    // Convert the map to an array of sub-arrays with date and its count
+    const resultArray = [];
+    dateCountMap.forEach((count, date) => {
+        resultArray.push([date, count]);
+    });
+
+    return resultArray;
+}
+//=============================================================
+function countMonthOccurrences(array) {
+    const dateCountMap = new Map();
+
+    // Iterate over each sub-array and extract the date
+    array.forEach(subArray => {
+        const dateTime = subArray[0];
+        const [day, month, year] = dateTime.split(/[\/,]/);
+        const monthYear = `${month}/${year}`; // Format as "MM/YYYY"
+
+
+
+        // Update the count of the date in the map
+        if (dateCountMap.has(monthYear)) {
+            dateCountMap.set(monthYear, dateCountMap.get(monthYear) + 1);
+        } else {
+            dateCountMap.set(monthYear, 1);
+        }
+    });
+
+    // Convert the map to an array of sub-arrays with date and its count
+    const resultArray = [];
+    dateCountMap.forEach((count, monthYear) => {
+        resultArray.push([monthYear, count]);
+    });
+
+    return resultArray;
+}
+//=============================================================
+function convertToDateObjects(array) {
+    return array.map(subArray => {
+        const dateString = subArray[0];
+        const dateParts = dateString.split('/');
+
+        let year, month, day;
+
+        // Determine the format of the date string and parse accordingly
+        if (dateParts.length === 3) {
+            // "DD/MM/YYYY"
+            [day, month, year] = dateParts;
+        } else if (dateParts.length === 2) {
+            // "MM/YYYY" - Assume the first of the month
+            [month, year] = dateParts;
+            day = 1;  // Default day if only month and year are provided
+        } else if (dateParts.length === 1) {
+            // "YYYY" - Assume the first day of the first month
+            year = dateParts[0];
+            month = 1;  // Default month
+            day = 1;    // Default day
+        } else {
+            // Invalid date format, default to some date
+            year = 1970;
+            month = 1;
+            day = 1;
+        }
+
+        // Months in JavaScript Date object are 0-indexed, so subtract 1 from month
+        return [new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10)), subArray[1]];
+    });
+}
+
+//=============================================================
+function plotStatsMonthly() {
+  statsChartDiv.style.display = 'flex';
+
+  var data = new google.visualization.DataTable();
+  data.addColumn('date', 'Month');
+  data.addColumn('number', 'Value');
+
+  let rows;
+  if (firstVisitStatsChk.checked) {
+    rows = convertToDateObjects(countMonthOccurrences(firstVisitDatesArray));
+  } else {
+    rows = convertToDateObjects(countMonthOccurrences(visitDatesArray));
+  }
+
+  var viewWindowOptions = {};
+  if (statsStartDateInput.checkValidity() && statsEndDateInput.checkValidity()) {
+    var startDate = new Date(statsStartDateInput.value);
+    var endDate = new Date(statsEndDateInput.value);
+    viewWindowOptions = { min: startDate, max: endDate };
+
+    rows = rows.filter(row => {
+      return dateYYYYMMDD(row[0]) >= dateYYYYMMDD(startDate) && dateYYYYMMDD(row[0]) <= dateYYYYMMDD(endDate);
+    });
+
+  }
+
+  totalCounts = rows.reduce((sum, row) => sum + row[1], 0);
+
+  var options = {
+    title: 'Monthly Bar Chart (' + totalCounts + ' visits)',
+    legend: { position: 'none' },
+    vAxis: {
+      title: 'Month',
+      format: 'MMM yyyy',
+      viewWindow: viewWindowOptions
+    },
+    hAxis: {
+      title: 'Value'
+    },
+    chartArea: {
+      width: '70%',
+      height: '85%'
+    }
+  };
+
+  data.addRows(rows);
+
+  // Create a DataView to apply random colors to each bar
+  var view = new google.visualization.DataView(data);
+  view.setColumns([
+    0,
+    1,
+    {
+      calc: function(data, row) {
+        return generateRandomColor();
+      },
+      type: 'string',
+      role: 'style'
+    }
+  ]);
+
+  var chart = new google.visualization.BarChart(document.getElementById('statsChartDiv'));
+  chart.draw(view, options);
+}
+//=============================================================
+function dateYYYYMMDD(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+//=============================================================
+function generateRandomColor() {
+  // Generate a random color that is not too close to white
+  var r = Math.floor(Math.random() * 200);
+  var g = Math.floor(Math.random() * 200);
+  var b = Math.floor(Math.random() * 200);
+  return `rgb(${r},${g},${b})`;
+}
+//=============================================================
+function plotStatsDaily() {
+  statsChartDiv.style.display = 'flex';
+
+  var data = new google.visualization.DataTable();
+  data.addColumn('date', 'Day');
+  data.addColumn('number', 'Value');
+
+  let rows;
+  if (firstVisitStatsChk.checked) {
+    rows = convertToDateObjects(countDayOccurrences(firstVisitDatesArray));
+  } else {
+    rows = convertToDateObjects(countDayOccurrences(visitDatesArray));
+  }
+
+  var viewWindowOptions = {};
+  if (statsStartDateInput.checkValidity() && statsEndDateInput.checkValidity()) {
+    var startDate = new Date(statsStartDateInput.value);
+    var endDate = new Date(statsEndDateInput.value);
+    viewWindowOptions = {min: startDate, max: endDate};
+    // Filter the rows to include only those within the specified date range
+       rows = rows.filter(row => {
+      return dateYYYYMMDD(row[0]) >= dateYYYYMMDD(startDate) && dateYYYYMMDD(row[0]) <= dateYYYYMMDD(endDate);
+    });
+  }
+
+  // Calculate the total counts
+  totalCounts = rows.reduce((sum, row) => sum + row[1], 0);
+
+  var options = {
+    title: 'Daily Bar Chart (' + totalCounts + ' visits)',
+    legend: { position: 'none' },
+    vAxis: {
+      title: 'Day',
+      format: 'MMM dd, yyyy',
+      viewWindow: viewWindowOptions
+    },
+    hAxis: {
+      title: 'Value'
+    },
+    chartArea: {
+      width: '70%',
+      height: '85%'
+    }
+  };
+
+  data.addRows(rows);
+
+  // Create a DataView to apply random colors to each bar
+  var view = new google.visualization.DataView(data);
+  view.setColumns([
+    0,
+    1,
+    {
+      calc: function(data, row) {
+        return generateRandomColor();
+      },
+      type: 'string',
+      role: 'style'
+    }
+  ]);
+
+  var chart = new google.visualization.BarChart(document.getElementById('statsChartDiv'));
+  chart.draw(view, options);
+}
+//=============================================================
+function showSearchScreen(){
+  patientSaved = true;
+  visitSaved = true;
+  activeScreen = "SEARCH";
+
+
+
+  patientControlDiv.style.display = "none";
+  homeDiv.style.display = "none";
+  patientDiv.style.display = "flex";
+  visitDiv.style.display = "none";
+  imageDiv.style.display = "none";
+  searchControlDiv.style.display = "flex";
+
+  const searchShowNumbers = document.getElementById("searchShowNumbers");
+  searchShowNumbers.innerHTML = getMessage('searchShowNumbers') ;
+  const searchShowNumbersChk = document.getElementById("searchShowNumbersChk");
+  searchShowNumbersChk.checked = showSearchNumbers;
+
+  if(newSearch){
+    if(searchData.length != 0){
+      nameTxt.value =searchData[0];
+      phoneTxt.value =searchData[1];
+      addressTxt.value =searchData[2];
+      birthDateTxt.value =searchData[3];
+      bloodTypeTxt.value =searchData[4];
+      patientNotesTxt.value =searchData[5];
+    }else{
+      clearInputs();
+    }
+
+    disablePatientInputs(false);
+    closePatientListBtn.disabled = true;
+    listPatientsBtn.disabled = false;
+    messageLbl.textContent  =  messages['searchScreenMessage'][language];
+
+    patientInfoDiv.style.display = "flex";
+    patientListDiv.style.display = "none";
+
+  }else{
+    listPatients();
+  }
+
+}
+//==========================================================
+function editVisitTime(){
+  disableVisitControls(true);
+  disableVisitInputs(true);
+
+  dateInput.disabled = false;
+  timeInput.disabled = false;
+
+
+
+  visitTimeTxt.style.display = "none"
+  editVisitTimeBtn.style.display = "none"
+  applyVisitTimeBtn.style.display = "block"
+  cancelVisitTimeBtn.style.display = "block"
+  timeInput.style.display = "block"
+  dateInput.style.display = "block"
+
+  validateVisitTime()
+}
+//==========================================================
+function cancelVisitTime(){
+  disableVisitControls(false);
+  disableVisitInputs(false);
+
+  visitTimeTxt.style.display = "block"
+  editVisitTimeBtn.style.display = "block"
+  applyVisitTimeBtn.style.display = "none"
+  cancelVisitTimeBtn.style.display = "none"
+  timeInput.style.display = "none"
+  dateInput.style.display = "none"
+  if(visitSaved){
+    saveVisitBtn.disabled = true;
+  }
+}
+//==========================================================
+function exitVisit(action){
+  if (!visitSaved){
+    oldMessage = messageLbl.textContent;
+    messageLbl.textContent = messages['doYouWantToSave'][language];
+    yesBtn.style.display = "block";
+    noBtn.style.display = "block";
+    cancelBtn.style.display = "block";
+    disableVisitControls(true);
+    disableVisitInputs(true);
+
+    cancelBtn.onclick = function() {
+      yesBtn.style.display = "none";
+      noBtn.style.display = "none";
+      cancelBtn.style.display = "none";
+      yesBtn.onclick = null;
+      noBtn.onclick = null;
+      cancelBtn.onclick = null;
+      messageLbl.textContent = oldMessage;
+      disableVisitControls(false);
+      disableVisitInputs(false);
+      return;
+    }
+
+    yesBtn.onclick = function() {
+      yesBtn.style.display = "none";
+      noBtn.style.display = "none";
+      cancelBtn.style.display = "none";
+      yesBtn.onclick = null;
+      noBtn.onclick = null;
+      cancelBtn.onclick = null;
+      saveVisit(action);
+    }
+    noBtn.onclick = function() {
+      visitSaved = true;
+      localStorage.setItem('recover', 'NONE');
+
+      yesBtn.style.display = "none";
+      noBtn.style.display = "none";
+      cancelBtn.style.display = "none";
+      yesBtn.onclick = null;
+      noBtn.onclick = null;
+      cancelBtn.onclick = null;
+      if(action=='HOME'){
+        showHomeScreen();
+      }else if(action == 'PATIENT'){
+        showPatientScreen();
+      }else if(action == 'NEXT'){
+        getVisit('NEXT');
+      }else if(action == 'PREVIOUS'){
+        getVisit('PREVIOUS');
+      }else if(action == 'ADD'){
+        addVisit();
+      }
+      else if(action == 'LIST'){
+        showVisitScreen();
+      }
+    }
+  }else{
+    if(action=='HOME'){
+      showHomeScreen();
+    }else if(action == 'PATIENT'){
+      showPatientScreen();
+    }else if(action == 'NEXT'){
+      getVisit('NEXT');
+    }else if(action == 'PREVIOUS'){
+      getVisit('PREVIOUS');
+    }else if(action == 'ADD'){
+      addVisit();
+    }else if(action == 'LIST'){
+      showVisitScreen();
+    }
+  }
+
+}
+//==========================================================
+function exitImage(action){
+  if(action=='HOME'){
+    imageElement.src="";
+    showHomeScreen();
+  }else if(action == 'PATIENT'){
+    imageElement.src="";
+    showPatientScreen();
+  }
+}
+//===============================================================
+function deletePatient(){
+  messageLbl.textContent = messages['sureDeletePatientRecord'][language];
+  yesBtn.style.display = "block";
+  noBtn.style.display = "block";
+  disablePatientControls(true);
+  disablePatientInputs(true);
+
+  yesBtn.onclick = function() {
+    patientSaved = true;
+    localStorage.setItem('recover', 'NONE');
+
+    messageLbl.textContent =  messages['pleaseWait'][language];
+    yesBtn.style.display = "none";
+    noBtn.style.display = "none";
+    yesBtn.onclick = null;
+    noBtn.onclick = null;
+    google.script.run.withSuccessHandler(function(response){
+      if (response.status=="SUCCESS"){
+        totalRecords -= 1;
+        newSearch = true;
+        showHomeScreen();
+      }else{
+        messageLbl.innerHTML = messages['googleError'][language] + "<br>" + response.error;
+      }
+    }).deletePatient(spreadsheetDict[activeSpreadsheetName], activeRow);
+  }
+
+  noBtn.onclick = function() {
+    messageLbl.textContent = getMessage("recordAndFile");
+    yesBtn.style.display = "none";
+    noBtn.style.display = "none";
+    yesBtn.onclick = null;
+    noBtn.onclick = null;
+    disablePatientControls(false);
+    disablePatientInputs(false);
+    if(patientSaved){
+      savePatientBtn.disabled = true;
+    }
+  }
+}
+//=======================================================
+function savePatient(action){
+
+  if(nameTxt.value.trim() == ""){
+    messageLbl.textContent =  messages['mustFillName'][language];
+    freezePage();
+    setTimeout(function() {
+      if (activeScreen == "PATIENT"){
+        if(newPatient){
+          messageLbl.textContent = messages['addingPatient'][language];
+        }else{
+          messageLbl.textContent = getMessage("recordAndFile");
+        }
+        unfreezePage();
+      }
+    }, messageDelay);
+    disablePatientControls(false);
+    disablePatientInputs(false);
+    if(newPatient){
+      showVisitBtn.disabled = true;
+      showImageBtn.disabled = true;
+      deletePatientBtn.disabled = true;
+    }
+    return;
+  }
+
+  messageLbl.textContent =  messages['pleaseWait'][language];
+  disablePatientControls(true);
+  disablePatientInputs(true);
+
+
+  if (newPatient){
+
+    activeSpreadsheetName = spreadsheetDictKeys[spreadsheetDictKeys.length-1];
+
+    var data = {
+      activeSpreadsheetId: spreadsheetDict[activeSpreadsheetName],
+      activeSpreadsheetName: activeSpreadsheetName,
+      spreadsheetFolderId: spreadsheetFolderId
+    };
+
+    google.script.run.withSuccessHandler(function(response){
+      if (response.status=="SUCCESS"){
+        totalRecords += 1;
+        newSearch = true;
+        spreadsheetDict[response.activeSpreadsheetName] = response.activeSpreadsheetId;
+        spreadsheetDictKeys = Object.keys(spreadsheetDict).sort();
+        activeSpreadsheetName = response.activeSpreadsheetName;
+        activeRow = response.activeRow;
+        newPatient = false;
+        savePatient(action);
+        exitPatientToSearchBtn.disabled = true;
+      }else{
+        messageLbl.innerHTML = messages['googleError'][language] + "<br>" + response.error;
+      }
+    }).addPatient(data);
+  }else{
+    var data = {
+      activeSpreadsheetId: spreadsheetDict[activeSpreadsheetName],
+      activeRow: activeRow,
+      name: encodeURIComponent(nameTxt.value),
+      phone: encodeURIComponent(arabicNumber(phoneTxt.value)),
+      address: encodeURIComponent(addressTxt.value),
+      birthDate: encodeURIComponent(birthDateTxt.value),
+      bloodType: encodeURIComponent(bloodTypeTxt.value),
+      patientNotes: encodeURIComponent(patientNotesTxt.value)
+    };
+
+    google.script.run.withSuccessHandler(function(response) {
+      if (response.status=="SUCCESS"){
+        patientSaved = true;
+        localStorage.setItem('recover', 'NONE');
+        newSearch = true;
+        activeName = nameTxt.value;
+        if (action){
+          yesBtn.style.display = "none";
+          noBtn.style.display = "none";
+          yesBtn.onclick = null;
+          noBtn.onclick = null;
+          if (action=='HOME'){
+            showHomeScreen();
+          }else if(action == 'VISIT'){
+            showVisitScreen();
+          }else if(action == 'IMAGE'){
+            showImageScreen();
+          }else if(action == 'SEARCH'){
+            showSearchScreen();
+          }
+        }else{
+          messageLbl.textContent =  messages['dataSavedSuccessfully'][language];
+          patientSaved = true;
+          localStorage.setItem('recover', 'NONE');
+          setTimeout(function() {
+            if(activeScreen == "PATIENT"){
+              messageLbl.textContent = getMessage("recordAndFile");
+              disablePatientControls(false);
+              disablePatientInputs(false)
+              savePatientBtn.disabled = true;
+            }
+          }, messageDelay);
+        }
+      }else{
+        messageLbl.innerHTML = messages['googleError'][language] + "<br>" + response.error;
+      }
+    }).savePatient(data);
+  }
+}
+//==============================================
+function getPatientList(){
+
+
+
+  searchData = [
+    nameTxt.value.trim(),
+    arabicNumber(phoneTxt.value.trim()),
+    addressTxt.value.trim(),
+    birthDateTxt.value.trim(),
+    bloodTypeTxt.value.trim(),
+    patientNotesTxt.value.trim()
+  ];
+
+  searchIndex = getSearchIndex();
+  if(searchIndex == -1) return;
+
+
+
+
+  messageLbl.textContent =  messages['pleaseWait'][language];
+
+  patientInfoDiv.style.display = "none";
+  exitSearchBtn.disabled = true;
+  listPatientsBtn.disabled = true;
+
+  const searchShowNumbersChk = document.getElementById("searchShowNumbersChk");
+  showSearchNumbers = searchShowNumbersChk.checked
+  searchShowNumbersChk.disabled = true;
+
+
+
+  google.script.run.withSuccessHandler(function(response) {
+    if (response.status=="SUCCESS"){
+      patientArray = response.patientArray;
+      if (patientArray.length == 0){
+        messageLbl.textContent = messages['noResultsFound'][language];
+        exitSearchBtn.disabled = false;
+        listPatientsBtn.disabled = false;
+        searchShowNumbersChk.disabled = false;
+        patientInfoDiv.style.display = "flex";
+      }else{
+        listPatients()
+      }
+    }else{
+      messageLbl.innerHTML = messages['googleError'][language] + "<br>" + response.error;
+    }
+  }).getPatientList(spreadsheetDict,searchIndex,searchData[searchIndex],showSearchNumbers);
+
+}
+//==============================================
+
+function listPatients(){
+  patientListDiv.innerHTML  = "";
+  newSearch = false;
+
+  exitSearchBtn.disabled = false;
+  closePatientListBtn.disabled = false;
+  listPatientsBtn.disabled = true;
+  patientListDiv.style.display = "block";
+  patientInfoDiv.style.display = "none";
+  messageLbl.textContent = getMessage ('totalSearchResults');
+
+
+  const searchShowNumbersChk = document.getElementById("searchShowNumbersChk");
+  showSearchNumbers = searchShowNumbersChk.checked
+  searchShowNumbersChk.disabled = true;
+
+  patientListDiv.style.display = "block";
+  for (var i = 0; i < patientArray.length; i++) {
+      if(showSearchNumbers){
+        var visitStr = " [" + patientArray[i][3]+ "]";
+        var imageStr = " [" + patientArray[i][4]+ "]"
+      }else{
+        var visitStr = "";
+        var imageStr = ""
+      }
+      patientListDiv.innerHTML += '<div class="patient-container">'+ (i+1) + '- '+
+      '<button class="patient-list-button" onclick="showPatientScreen(' + i + ')">' + patientArray[i][0]+  '</button>' +
+      '<button class="patient-list-visits"  onclick="showVisitScreen(' + i + ')">' + messages['visits'][language] + visitStr + '</button>' +
+      '<button class="patient-list-visits"  onclick="showImageScreen(' + i + ')">' + messages['images'][language] + imageStr + '</button>'+
+       '</div>';
+  }
+}
+//==============================================
+function closePatientList(){
+  messageLbl.textContent  =  messages['searchScreenMessage'][language];
+  newSearch = true;
+  if(searchData.length != 0){
+    nameTxt.value =searchData[0];
+    phoneTxt.value =searchData[1];
+    addressTxt.value =searchData[2];
+    birthDateTxt.value =searchData[3];
+    bloodTypeTxt.value =searchData[4];
+    patientNotesTxt.value =searchData[5];
+  }
+
+  const searchShowNumbersChk = document.getElementById("searchShowNumbersChk");
+  searchShowNumbersChk.disabled = false;
+  listPatientsBtn.disabled = false;
+  closePatientListBtn.disabled = true;
+  patientListDiv.style.display = "none";
+  patientInfoDiv.style.display = "flex";
+  disablePatientControls(false);
+  disablePatientInputs(false);
+}
+//==============================================
+function getSearchIndex(){
+  oldMessage = messageLbl.textContent;
+  // check if more than one field is filled
+  searchIndex = -1;
+  for(var index = 0;index < 6; index++){
+    if(searchData[index] !=""){
+      if (searchIndex != -1){
+        messageLbl.textContent = messages['writeOnlyInOneField'][language];
+        freezePage();
+        setTimeout(function(){
+          messageLbl.textContent = oldMessage;
+          unfreezePage();
+        }, messageDelay);
+        return -1;
+      }else{
+        searchIndex = index;
+      }
+    }
+  }
+
+  // check of no field is filled
+  if (searchIndex == -1){
+    messageLbl.textContent = messages['writeInOneField'][language];
+    freezePage();
+    setTimeout(function(){
+      messageLbl.textContent = oldMessage;
+      unfreezePage();
+    }, messageDelay);
+    return -1;
+  }
+  return searchIndex;
+}
+
+//==============================================
+function disablePatientInputs(state){
+  nameTxt.disabled = state;
+  phoneTxt.disabled = state;
+  addressTxt.disabled = state;
+  birthDateTxt.disabled = state;
+  bloodTypeTxt.disabled = state;
+  patientNotesTxt.disabled = state;
+
+}
+//==============================================
+function disableVisitInputs(state){
+  visitNotesTxt.disabled = state;
+}
+
+//==============================================
+function disablePatientControls(state){
+  exitPatientBtn.disabled = state;
+  savePatientBtn.disabled = state;
+  deletePatientBtn.disabled = state;
+  showVisitBtn.disabled = state;
+  showImageBtn.disabled = state;
+  exitPatientToSearchBtn.disabled = state;
+}
+//==============================================
+function disableVisitControls(state){
+  exitVisitToHomeBtn.disabled = state;
+  exitVisitToPatientBtn.disabled = state;
+  addVisitBtn.disabled = state;
+  saveVisitBtn.disabled = state;
+  deleteVisitBtn.disabled = state;
+  listVisitBtn.disabled = state;
+  previousVisitBtn.disabled = state;
+  nextVisitBtn.disabled = state;
+  dateInput.disabled = state;
+  timeInput.disabled = state;
+  editVisitTimeBtn.disabled = state;
+}
+//==============================================
+function disableHomeControls(state){
+  addPatientBtn.disabled = state;
+  showSearchBtn.disabled = state;
+  showImportBtn.disabled = state;
+  languageSelector.disabled = state;
+  showStatsBtn.disabled = state;
+}
+
+//==============================================
+function disableImportControls(state){
+  exitImportBtn.disabled = state;
+  importBtn.disabled = state;
+}
+//==============================================
+function disableImageControls(state){
+  exitImageToHomeBtn.disabled = state;
+  exitImageToPatientBtn.disabled = state;
+  addImagBtn.disabled = state;
+  deleteImageBtn.disabled = state;
+  viewImagBtn.disabled = state;
+  listImagesBtn.disabled = state;
+
+  const imageSizeTxt = document.getElementById("imageSizeTxt");
+  imageSizeTxt.disabled = state;
+
+  const resizeImageChk = document.getElementById("resizeImageChk");
+  resizeImageChk.disabled = state;
+
+}
+//==================================================
+function showVisitScreen(patientIndex){
+  visitSaved=true;
+  patientSaved=true;
+  activeScreen = "VISIT";
+  homeDiv.style.display = "none";
+  patientDiv.style.display = "none";
+  imageDiv.style.display = "none";
+  visitDiv.style.display = "block";
+
+  if(patientIndex == 'SAVED'){
+    getVisit('SAVED');
+  }else{
+    if (patientIndex !== undefined){
+      activeName = patientArray[patientIndex][0];
+      activeSpreadsheetName = patientArray[patientIndex][1];
+      activeRow = patientArray[patientIndex][2];
+    }
+    getVisitList()
+  }
+}
+//==================================================
+function getVisitList(){
+  visitInfoDiv.style.display = "none";
+  visitListDiv.style.display = "none";
+
+  messageLbl.textContent =  messages['pleaseWait'][language];
+  disableVisitControls(true);
+
+  var data = {
+    activeSpreadsheetId: spreadsheetDict[activeSpreadsheetName],
+    activeRow:activeRow,
+  };
+
+  google.script.run.withSuccessHandler(function(response){
+    if (response.status=="SUCCESS"){
+      visitArray = response.visitArray;
+      totalVisits = visitArray.length;
+      listVisits();
+    }else{
+      messageLbl.innerHTML = messages['googleError'][language] + "<br>" + response.error;
+    }
+  }).getVisitList(data);
+}
+//===============================================
+function saveVisit(action){
+  messageLbl.textContent = messages['savingVisit'][language];
+
+  disableVisitControls(true);
+  disableVisitInputs(true);
+
+  var data = {
+    activeSpreadsheetId: spreadsheetDict[activeSpreadsheetName],
+    activeRow: activeRow,
+    activeVisit:activeVisit,
+    visitNotes: encodeURIComponent(visitNotesTxt.value),
+  };
+
+  google.script.run.withSuccessHandler(function(response) {
+    if (response.status=="SUCCESS"){
+      if (action){
+        visitSaved = true;
+        localStorage.setItem('recover', 'NONE');
+        yesBtn.style.display = "none";
+        noBtn.style.display = "none";
+        yesBtn.onclick = null;
+        noBtn.onclick = null;
+        if(action=='HOME'){
+          showHomeScreen();
+        }else if(action == 'PATIENT'){
+          showPatientScreen();
+        }else if(action == 'NEXT'){
+          getVisit('NEXT');
+        }else if(action == 'PREVIOUS'){
+          getVisit('PREVIOUS');
+        }else if(action == 'ADD'){
+          addVisit();
+        }else if(action == 'LIST'){
+          showVisitScreen();
+        }
+      }else{
+        messageLbl.textContent =  messages['dataSavedSuccessfully'][language];
+        visitSaved = true;
+        localStorage.setItem('recover', 'NONE');
+        setTimeout(function() {
+          if(activeScreen == "VISIT_EDIT"){
+            messageLbl.textContent = getMessage("nameAndVisit");
+            disableVisitControls(false);
+            disableVisitInputs(false)
+            saveVisitBtn.disabled = true;
+          }
+        }, messageDelay);
+      }
+    }else{
+      messageLbl.innerHTML = messages['googleError'][language] + "<br>" + response.error;
+    }
+  }).saveVisit(data);
+}
+//===============================================
+function deleteVisit(){
+  messageLbl.textContent = messages['sureDeleteVisit'][language];
+  disableVisitControls(true);
+  disableVisitInputs(true);
+  yesBtn.style.display = "block";
+  noBtn.style.display = "block";
+
+
+  yesBtn.onclick = function() {
+    visitSaved = true;
+    localStorage.setItem('recover', 'NONE');
+    messageLbl.textContent =  messages['pleaseWait'][language];
+    yesBtn.style.display = "none";
+    noBtn.style.display = "none";
+    yesBtn.onclick = null;
+    noBtn.onclick = null;
+    var data = {
+      activeSpreadsheetId: spreadsheetDict[activeSpreadsheetName],
+      activeRow: activeRow,
+      activeVisit:activeVisit
+    };
+    google.script.run.withSuccessHandler(function(response) {
+      if (response.status=="SUCCESS"){
+        newSearch = true;
+        getVisitList();
+      }else{
+        messageLbl.innerHTML = messages['googleError'][language] + "<br>" + response.error;
+      }
+    }).deleteVisit(data);
+  }
+
+  noBtn.onclick = function() {
+    messageLbl.textContent = getMessage("nameAndVisit");
+    yesBtn.style.display = "none";
+    noBtn.style.display = "none";
+    yesBtn.onclick = null;
+    noBtn.onclick = null;
+    disableVisitControls(false);
+    disableVisitInputs(false);
+    if(visitSaved){
+      saveVisitBtn.disabled = true;
+    }
+  }
+
+}
+//==============================================
+function addVisit(){
+  messageLbl.textContent =  messages['pleaseWait'][language];
+  visitListDiv.style.display = "none"
+  disableVisitControls(true);
+  disableVisitInputs(true);
+
+  var data = {
+    activeSpreadsheetId: spreadsheetDict[activeSpreadsheetName],
+    activeRow:activeRow,
+    visitTime:new Date().toLocaleString('en-GB')
+  };
+
+  google.script.run.withSuccessHandler(function(response){
+    if (response.status=="SUCCESS"){
+      newSearch = true;
+      visitSaved = true;
+      visitTimeTxt.value = response.visitTime;
+      visitNotesTxt.value = response.visitNotes;
+      activeVisit = response.activeVisit;
+      totalVisits = response.activeVisit;
+      visitInfoDiv.style.display = "block";
+      messageLbl.textContent = getMessage("nameAndVisit");
+    }else{
+      messageLbl.innerHTML = messages['googleError'][language] + "<br>" + response.error;
+    }
+    activeScreen = "VISIT_EDIT";
+    disableVisitControls(false);
+    disableVisitInputs(false);
+    saveVisitBtn.disabled = true;
+  }).addVisit(data);
+}
+//===============================================
+function getVisit(visitIndex){
+  activeScreen="VISIT_EDIT";
+  if (visitIndex == "NEXT"){
+    if(activeVisit == totalVisits ){
+      visitIndex = 1;
+    }else{
+      visitIndex = activeVisit + 1;
+    }
+  }else if (visitIndex == "PREVIOUS"){
+    if(activeVisit == 1 ){
+      visitIndex = totalVisits;
+    }else{
+      visitIndex = activeVisit - 1;
+    }
+  }
+  messageLbl.textContent =  messages['pleaseWait'][language];
+  visitListDiv.style.display = "none";
+  disableVisitControls(true);
+  disableVisitInputs(true);
+
+
+
+  if (visitIndex == "SAVED"){
+    visitSaved = false;
+    visitTimeTxt.value = localStorage.getItem('visitTime');
+    visitNotesTxt.value = localStorage.getItem('visitNotes');
+    activeName = localStorage.getItem('activeName');
+    activeRow = parseInt(localStorage.getItem('activeRow'));
+    totalVisits = parseInt(localStorage.getItem('totalVisits'));
+    activeVisit = parseInt(localStorage.getItem('activeVisit'));
+    activeSpreadsheetName = localStorage.getItem('activeSpreadsheetName');
+
+    disableVisitControls(false);
+    disableVisitInputs(false);
+    listVisitBtn.disabled=false;
+    visitInfoDiv.style.display = "block";
+
+    messageLbl.textContent = getMessage("nameAndVisit");
+
+    saveVisitBtn.disabled=false;
+    return
+  }
+
+  activeVisit = visitIndex;
+  var data = {
+    activeSpreadsheetId: spreadsheetDict[activeSpreadsheetName],
+    activeRow:activeRow,
+    activeVisit:activeVisit,
+  };
+
+  google.script.run.withSuccessHandler(function(response){
+    if (response.status=="SUCCESS"){
+      visitTimeTxt.value = response.visitTime;
+      visitNotesTxt.value = response.visitNotes;
+      disableVisitControls(false);
+      disableVisitInputs(false);
+      listVisitBtn.disabled=false;
+      visitInfoDiv.style.display = "block";
+      messageLbl.textContent = getMessage("nameAndVisit");
+      visitSaved = true;
+      saveVisitBtn.disabled=true;
+    }else{
+      messageLbl.innerHTML = messages['googleError'][language] + "<br>" + response.error;
+    }
+  }).getVisit(data);
+}
+//===============================================
+function clearInputs(){
+  nameTxt.value = '';
+  phoneTxt.value = '';
+  addressTxt.value = '';
+  birthDateTxt.value = '';
+  bloodTypeTxt.value = '';
+  patientNotesTxt.value = '';
+  visitTimeTxt.value = '';
+  visitNotesTxt.value = '';
+}
+//===============================================
+function arabicNumber(number){
+  const numDict = {
+    '٠': '0',
+    '١': '1',
+    '٢': '2',
+    '٣': '3',
+    '٤': '4',
+    '٥': '5',
+    '٦': '6',
+    '٧': '7',
+    '٨': '8',
+    '٩': '9'
+  };
+ return number.replace(/[٠-٩]/g, function (num) {
+    return numDict[num];
+  });
+}
+//===============================================
+function importFile() {
+
+  xlsFileInput.click();
+  xlsFileInput.addEventListener('change', function () {
+    if (this.files[0]) {
+      const file = this.files[0];
+
+      activeSpreadsheetName = spreadsheetDictKeys[spreadsheetDictKeys.length-1];
+
+      disableImportControls(true);
+      messageLbl.textContent =  messages['waitExelFileImport'][language];
+
+
+      const fr = new FileReader();
+      fr.onload = function(e) {
+        const obj = {
+          filename: file.name,
+          mimeType: file.type,
+          bytes: [...new Int8Array(e.target.result)]
+        };
+        google.script.run.withSuccessHandler(function(response){
+          xlsFileInput.value="";
+          newSearch = true;
+          disableImportControls(false);
+          if(response.status == "SUCCESS"){
+            messageLbl.textContent = getMessage('recordImportSucess',response);
+          }else{
+            messageLbl.textContent =  messages['importingFailed'][language];
+          }
+        }).importFile(obj, spreadsheetDict[activeSpreadsheetName]);
+      };
+      fr.readAsArrayBuffer(file);
+
+    }
+  }, { once: true });
+
+
+
+}
+//===============================================
+function switchNoteDirection() {
+    var textarea = document.getElementById('visitNotesTxt');
+    if (textarea.getAttribute('dir') === 'rtl') {
+        textarea.setAttribute('dir', 'ltr');
+    } else {
+        textarea.setAttribute('dir', 'rtl');
+    }
+    textarea = document.getElementById('patientNotesTxt');
+    if (textarea.getAttribute('dir') === 'rtl') {
+        textarea.setAttribute('dir', 'ltr');
+    } else {
+        textarea.setAttribute('dir', 'rtl');
+    }
+
+}
+//===============================================
+function setDateAndTime(){
+  const currentDate = new Date();
+
+  // Format the date to YYYY-MM-DD for the date input
+  const formattedDate = currentDate.toISOString().slice(0, 10);
+
+  // Format the time to HH:MM for the time input
+  const formattedTime = currentDate.toTimeString().slice(0, 5);
+
+  // Set the values of the input fields
+  dateInput.value = formattedDate;
+  timeInput.value = formattedTime;
+}
+//===============================================
+function updateVisitTime(){
+
+  messageLbl.textContent = messages['sureUpdateTime'][language];
+  yesBtn.style.display = "block";
+  noBtn.style.display = "block";
+
+  applyVisitTimeBtn.disabled = true;
+  cancelVisitTimeBtn.disabled = true;
+  timeInput.disabled = true;
+  dateInput.disabled = true;
+
+
+  yesBtn.onclick = function() {
+    messageLbl.textContent =  messages['pleaseWait'][language];
+    yesBtn.style.display = "none";
+    noBtn.style.display = "none";
+    yesBtn.onclick = null;
+    noBtn.onclick = null;
+
+    const dateTime = new Date(dateInput.value + "T" + timeInput.value).toLocaleString('en-GB');
+    const data = {
+      dateTime:dateTime,
+      activeSpreadsheetId: spreadsheetDict[activeSpreadsheetName],
+      activeRow: activeRow,
+      activeVisit:activeVisit
+    };
+
+    google.script.run.withSuccessHandler(function(response) {
+      if (response.status=="SUCCESS"){
+        visitTimeTxt.value = dateTime;
+        applyVisitTimeBtn.disabled = false;
+        cancelVisitTimeBtn.disabled = false;
+        cancelVisitTime();
+        messageLbl.textContent = getMessage("nameAndVisit");
+      }else{
+        messageLbl.innerHTML = messages['googleError'][language] + "<br>" + response.error;
+      }
+    }).updateVisitTime(data);
+  }
+
+  noBtn.onclick = function() {
+    messageLbl.textContent = getMessage("nameAndVisit");
+    yesBtn.style.display = "none";
+    noBtn.style.display = "none";
+    yesBtn.onclick = null;
+    noBtn.onclick = null;
+    applyVisitTimeBtn.disabled = false;
+    cancelVisitTimeBtn.disabled = false;
+    timeInput.disabled = false;
+    dateInput.disabled = false;
+  }
+}
+//==================================================
+function showImageScreen(patientIndex){
+  if (patientIndex !== undefined){
+    activeName = patientArray[patientIndex][0];
+    activeSpreadsheetName = patientArray[patientIndex][1];
+    activeRow = patientArray[patientIndex][2];
+  }
+  imageListDiv.innerHTML="";
+  visitSaved=true;
+  patientSaved=true;
+  activeScreen = "IMAGE";
+  homeDiv.style.display = "none";
+  patientDiv.style.display = "none";
+  visitDiv.style.display = "none";
+  imageDiv.style.display = "block";
+  imageListDiv.style.display = "none";
+  imageElement.style.display = "none";
+  imageMessage.innerHTML = getMessage('imageWillBeReduced') ;
+  const imageSizeTxt = document.getElementById("imageSizeTxt");
+  imageSizeTxt.value = maxImageSize;
+  const resizeImageChk = document.getElementById("resizeImageChk");
+  resizeImageChk.checked = enableImageResize;
+  getImageList()
+}
+//===============================================
+function getImageList() {
+  imageFileInput.value = '';
+  disableImageControls(true);
+  messageLbl.textContent = messages['pleaseWait'][language];
+
+  var data = {
+    activeSpreadsheetId: spreadsheetDict[activeSpreadsheetName],
+    activeRow:activeRow,
+    imageFolderId: imageFolderId
+  };
+
+  google.script.run.withSuccessHandler(function(response){
+    if (response.status=="SUCCESS"){
+      imageArray = response.imageArray;
+      listImages()
+    }else{
+      messageLbl.innerHTML = messages['googleError'][language] + "<br>" + response.error;
+    }
+  }).getImageList(data);
+}
+//===============================================
+function uploadImage() {
+  if (enableImageResize){
+    oldMessage = messageLbl.textContent;
+    // Check if the input value is an integer
+    if (! ((/^\d+$/.test(maxImageSize) && parseInt(maxImageSize) > 0))) {
+      messageLbl.textContent =  messages['imageSizeMustBeInteger'][language];
+      freezePage();
+      setTimeout(function() {
+        messageLbl.textContent = oldMessage;
+        unfreezePage();
+      }, messageDelay);
+      return;
+    }
+  }
+
+  imageFileInput.click();
+  imageFileInput.addEventListener('change', function () {
+    if (this.files[0]) {
+      disableImageControls(true);
+      if (enableImageResize){
+        resizeImage(this.files[0], maxImageSize * 1024 * 1024);
+      }else{
+        messageLbl.textContent = messages['uploadingImage'][language];
+        uploadResizedImage(this.files[0])
+      }
+    }
+  }, { once: true });
+}
+//===============================================
+function resizeImage(file, maxSize) {
+  const fr = new FileReader();
+  fr.onload = function (e) {
+    const img = new Image();
+    img.onload = function () {
+      const canvas = document.createElement('canvas');
+      let width = img.width;
+      let height = img.height;
+
+      // Resize the image if it exceeds maxSize
+      if (width * height > maxSize) {
+        const aspectRatio = width / height;
+        width = Math.sqrt(maxSize * aspectRatio);
+        height = maxSize / width;
+        messageLbl.textContent =  messages['imageResizeAndUploading'][language];
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Ensure the output file has a .jpg extension
+        const fileNameJpg = file.name.replace(/\.[^.]+$/, '.jpg');
+        // Convert the resized image to a JPEG with 90% quality
+        canvas.toBlob(function (blob) {
+          const resizedFile = new File([blob], fileNameJpg, {
+            type: 'image/jpeg',
+            lastModified: Date.now(),
+          });
+          // Upload the resized image
+          uploadResizedImage(resizedFile);
+        }, 'image/jpeg', 0.9);
+      }else{
+        messageLbl.textContent = messages['uploadingImage'][language];
+        uploadResizedImage(file);
+      }
+    };
+    img.src = e.target.result;
+  };
+  fr.readAsDataURL(file);
+}
+//===============================================
+function uploadResizedImage(file) {
+
+  const fr = new FileReader();
+  fr.onload = function(e) {
+    const obj = {
+      filename: file.name,
+      mimeType: file.type,
+      bytes: [...new Int8Array(e.target.result)]
+    };
+
+    var data = {
+      file:obj,
+      activeSpreadsheetId: spreadsheetDict[activeSpreadsheetName],
+      activeRow:activeRow,
+      imageFolderId: imageFolderId
+    };
+    google.script.run.withSuccessHandler(function(response){
+      if(response.status == "SUCCESS"){
+        newSearch = true;
+        messageLbl.textContent = messages['imageUploadedSuccessfully'][language];
+        getImageList();
+      }else{
+        messageLbl.textContent = messages['imageUploadingFailed'][language];
+        disableImageControls(false);
+      }
+      imageUploaded = true;
+    }).uploadImage(data);
+  };
+  fr.readAsArrayBuffer(file);
+}
+//===============================================
+function getImage(imageIndex){
+
+  imageListDiv.style.display = "none";
+  messageLbl.textContent = messages['pleaseWait'][language];
+  disableImageControls(true);
+  var data = {
+    activeImageId:imageArray[imageIndex][1],
+  };
+
+  google.script.run.withSuccessHandler(function(response) {
+    if (response.status=="SUCCESS"){
+      imageElement.style.display = "block";
+      activeImageId = imageArray[imageIndex][1];
+      imageElement.src = response.imageUrl;
+      messageLbl.textContent = imageArray[imageIndex][0] + ' ــ (' +imageArray[imageIndex][2] + ')';;
+      listImagesBtn.disabled=false;
+      viewImagBtn.disabled=false;
+      deleteImageBtn.disabled=false;
+    }else{
+      messageLbl.innerHTML = messages['googleError'][language] + "<br>" + response.error;
+    }
+    disableImageControls(false)
+  }).getImage(data);
+}
+//===============================================
+function deleteImage(){
+  const oldMessage = messageLbl.textContent;
+
+  messageLbl.textContent = messages['sureDeleteImage'][language];
+  disableImageControls(true);
+  yesBtn.style.display = "block";
+  noBtn.style.display = "block";
+
+  noBtn.onclick = function() {
+    messageLbl.textContent = oldMessage;
+    yesBtn.style.display = "none";
+    noBtn.style.display = "none";
+    yesBtn.onclick = null;
+    noBtn.onclick = null;
+    disableImageControls(false);
+  }
+
+  yesBtn.onclick = function() {
+    messageLbl.textContent =  messages['pleaseWait'][language];
+    yesBtn.style.display = "none";
+    noBtn.style.display = "none";
+    yesBtn.onclick = null;
+    noBtn.onclick = null;
+
+
+    var data = {
+      activeImageId:activeImageId
+    };
+
+    google.script.run.withSuccessHandler(function(response) {
+      if (response.status=="SUCCESS"){
+        newSearch = true;
+        getImageList();
+      }else{
+        messageLbl.innerHTML = messages['googleError'][language] + "<br>" + response.error;
+        disableImageControls(false)
+      }
+    }).deleteImage(data);
+  }
+}
+//===============================================
+function viewImage(){
+  const newWindow = window.open();
+  newWindow.document.write('<img src="' + imageElement.getAttribute("src") + '">');
+}
+//===============================================
+function listImages() {
+  imageListDiv.innerHTML="";
+  imageElement.style.display = "none";
+  if (imageArray.length == 0){
+    messageLbl.textContent = messages['noImages'][language];
+  }else{
+    imageListDiv.style.display = "block";
+    for (var i = 0; i < imageArray.length; i++) {
+        imageListDiv.innerHTML += '<div><button class="image-list-button" onclick="getImage(' + i + ')">'
+            +imageArray[i][0] + ' ــ (' +imageArray[i][2]+ ') </button></div>';
+    }
+    messageLbl.textContent = getMessage('nameAndTotalImages');
+  }
+  disableImageControls(false);
+  listImagesBtn.disabled=true;
+  viewImagBtn.disabled=true;
+  deleteImageBtn.disabled=true;
+}
+//===============================================
+function updateMaxImageSize(){
+const imageSizeTxt = document.getElementById("imageSizeTxt");
+maxImageSize = imageSizeTxt.value;
+}
+//===============================================
+function updateImageSizeChk(){
+const resizeImageChk = document.getElementById("resizeImageChk");
+enableImageResize = resizeImageChk.checked;
+}
+//===============================================
+function listVisits() {
+  visitSaved = true;
+  visitListDiv.innerHTML="";
+  visitInfoDiv.style.display = "none";
+
+  if (totalVisits == 0){
+    messageLbl.textContent = getMessage('nameAndTotalVisits');
+  }else{
+    visitListDiv.style.display = "block";
+    for (var i = 0; i < totalVisits; i++) {
+        visitListDiv.innerHTML += '<div><button class="visit-list-button" onclick="getVisit(' + (i+1) + ')">' +'[' +(i+1)+']&nbsp;&nbsp;&nbsp;&nbsp;' + '['+visitArray[i][0] + ']' + '<br>' + visitArray[i][1].replace(/\n/g, "<br>") + '</button></div>';
+    }
+    messageLbl.textContent = getMessage('nameAndTotalVisits');
+  }
+
+
+
+  disableVisitControls(false);
+  disableVisitInputs(false);
+
+  listVisitBtn.disabled=true;
+  deleteVisitBtn.disabled=true;
+  saveVisitBtn.disabled=true;
+  nextVisitBtn.disabled=true;
+  previousVisitBtn.disabled=true;
+}
+//===============================================
+function updateMaxImageSize(){
+  const imageSizeTxt = document.getElementById("imageSizeTxt");
+  maxImageSize = imageSizeTxt.value;
+}
+//===============================================
+function updateImageSizeChk(){
+  const resizeImageChk = document.getElementById("resizeImageChk");
+  enableImageResize = resizeImageChk.checked;
+}
+//===============================================
+function freezePage() {
+    document.getElementById('overlayDiv').style.display = 'flex';
+}
+//===============================================
+function unfreezePage() {
+    document.getElementById('overlayDiv').style.display = 'none';
+}
+
+
+
+
+function enableEnterKeySeaerch(){
+  var inputIds = ['nameTxt', 'phoneTxt', 'addressTxt', 'birthDateTxt', 'bloodTypeTxt'];
+  inputIds.forEach(function(id) {
+    var inputElement = document.getElementById(id);
+
+    // Check if the element with the given ID exists
+    if (inputElement) {
+      inputElement.addEventListener('keydown', function(event) {
+        // Check if the pressed key is Enter (key 13)
+        if (event.key === 'Enter') {
+          if(activeScreen == "SEARCH"){
+            getPatientList();
+          }
+        }
+      });
+    }
+  });
+}
+</script>
