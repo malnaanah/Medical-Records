@@ -1,0 +1,390 @@
+ 
+<style>
+
+  body{
+    
+    margin:0px;
+    padding:0px;
+    display: flex;
+    justify-content: left;
+    flex-direction: column;
+  }
+
+.material-icons {
+  padding:0px;
+  font-size: 32px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+input {
+  height: 28px;
+  background-color:#ffffff;
+}
+textarea {
+  background-color:#ffffff;
+}
+
+
+label {
+  border: 1px solid #222222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button {
+  /* font-size: 20px; */
+  background-color: #bbbbbb;
+  color:#0000dd;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+input:disabled, textarea:disabled {
+  background-color: #cccccc; /* Set a gray background color */
+  color: #000000; /* Set a gray text color */
+}
+
+button:disabled{
+  background-color: #777777; /* Set a gray background color */
+
+}
+
+
+#disclaimerAgreeDiv p{
+
+  margin: 10px; /* Add spacing around each item */
+
+}
+
+.patient-container{
+      display: flex;
+      /* align-items: center;
+      justify-content: center; */
+}
+
+#imageElement{
+  width:100%;
+}
+
+.image-list-button, .visit-list-button, .patient-list-button, .patient-list-icon, .patient-list-visits {
+  cursor: pointer;
+  outline: none;
+  border: none;
+  border-radius: 3px;
+  margin:5px;
+  padding:3px;
+  background-color: #3997b4;
+  color: #ffffff;
+}
+
+.image-list-button {
+  min-height:30;
+  font-size: 16px;
+  box-sizing: border-box;
+  width:100%;
+  display: inline-block;
+  text-align: center;
+    /* flex-grow: 1; */
+}
+
+.patient-list-button {
+  min-height:30px;
+  flex-grow: 1;
+  font-size: 14px;
+
+}
+
+.patient-list-visits{
+  height:30px;
+  width:90px;
+  font-size:14px;
+}
+
+.patient-list-icon {
+  color:#3997b4;
+  background-color: rgba(0, 0, 0, 0);
+  font-size: 40px!important;
+  height:30px!important;
+}
+
+.visit-list-button {
+  font-size: 16px;
+  box-sizing: border-box;
+  width:100%;
+  display: inline-block;
+}
+
+
+#imageListDiv, #visitListDiv{
+    display:flex;
+    flex-direction: column;
+    /* text-align:center; */
+}
+
+#imageListDiv, #visitListDiv, #patientListDiv {
+  background:#b2ce8f;
+  padding:5px;
+}
+
+
+
+
+div {
+  display: flex;
+  /* align-items: right; */
+  gap: 0px;
+  margin:0px;
+  padding: 0px;
+}
+
+
+
+
+#disclaimerDiv {
+  padding:15px;
+    display: grid;
+  place-items: center;
+  background-color:#f2e832;
+}
+
+#disclaimerAgreeBtn{
+  width:100px;
+}
+
+.disclaimerMessage{
+  font-size: 20px;
+  font-weight: bold;
+  color: #b20000;
+}
+
+
+
+
+#mainDiv {
+  position: absolute;
+  left: 0;
+  margin:0px;
+  width:100%;
+  max-width:900px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  background-color: #00bfd9;
+}
+
+#creditDiv {
+  display:flex;
+  text-align: center;
+  justify-content: center;
+  margin:0px;
+  padding:0px;
+  background-color: #eeeeee;
+}
+
+#visitNumberTxt,#imageNumberTxt{
+  width:7%!important;
+}
+
+
+#patientDiv, #visitDiv, #welcomeDiv, #statsDiv{
+  padding:0px;
+  margin:0px;
+}
+
+#imageMessage, #searchShowNumbers{
+    font-weight: bold; /* Makes the font bold */
+    font-size: 14px; /* Sets the font size to 12 pixels */
+    background-color:#e2e69c;
+}
+
+#visitTimeDiv{
+  display: flex!important;
+  flex-direction: row;
+}
+
+#visitTimeTxt{
+  width:70%;
+}
+
+#dateInput, #timeInput{
+  width:30%;
+}
+#imageSizeTxt{
+  width:40px;
+  text-align:center;
+
+
+}
+
+#messageDiv {
+  margin:5px;
+  text-align:center;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  background-color:#f2e832;
+  min-height:35px;
+}
+
+
+#importDiv input {
+  width:60%;
+
+}
+
+
+#messageDiv button {
+    flex-grow: 1;
+    height:35px;
+}
+
+#messageDiv label {
+    flex-grow: 1;
+    min-height:35px;
+}
+
+#messageDiv button {
+  width:18%;
+  margin:2px;
+}
+
+#messageDiv label {
+  border:0px;
+  padding:3px;
+  width:70%;
+}
+
+
+
+
+#switchVisitDirectionBtn, #switchPatientDirectionBtn{
+  margin:0px;
+  width:30px;
+  height:155px;
+}
+
+
+
+.statsOptionsDiv input{
+  width:20%;
+}
+
+
+.infoDiv input, textarea{
+  width:65%;
+}
+
+
+
+
+#visitTimeDiv{
+  width:66%;
+}
+
+
+
+.controlDiv{
+  height:35px;
+}
+
+#patientDiv, .infoDiv, #visitDiv, #statsDiv, .statsOptionsDiv {
+  flex-direction: column;
+}
+
+.infoDiv, .controlDiv, .statsOptionsDiv{
+  margin:3px;
+  padding:3px;
+  gap:3px;
+}
+
+
+.controlDiv button, label {
+    flex-grow: 1;
+}
+
+
+.controlDiv, .infoDiv, .statsOptionsDiv{
+  background-color:#7593a7;
+
+}
+
+
+
+#patientNotesTxt, #visitNotesTxt, .notes-label {
+  height:150px;
+}
+
+
+
+
+.navagation-button{
+  color:#ff0000;
+  background-color:#b2ce8f;
+
+}
+
+.navagation-button:disabled{
+  background-color:#777777;
+}
+
+
+
+.text-icon {
+  font-weight: bold;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay {
+      z-index: 999; /* Make sure it's on top */
+    display:none;
+    background-color: rgba(1, 1, 1, 0.05);
+    color: #ff4858;
+    padding: 20px;
+    text-align: center;
+    max-width:900px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.overlay-icon {
+    font-size: 100px !important; /* Adjust the size as needed */
+}
+
+.statsOptionsDiv button { 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding:0px;
+  margin:0px;
+  font-size:16px!important;
+}
+
+.statsOptionsDiv label { 
+  background-color:#e2e69c;
+  text-align: center;
+  align-items: center;
+  justify-content:center;
+  border: 1px solid #222222;
+  display: flex;
+  padding:0px;
+  margin:0px;
+  font-size:16px!important;
+}
+
+#firstVisitStatsChk {
+    margin-left: 10px; /* Left margin */
+    margin-right: 10px;
+}
+</style>
